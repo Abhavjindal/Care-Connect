@@ -299,6 +299,24 @@ const CheckAppointments = () => {
           color: #f9a8d4;
         }
 
+        .status-pending {
+          background: rgba(245, 158, 11, 0.15);
+          border: 1px solid rgba(245, 158, 11, 0.3);
+          color: #fbbf24;
+        }
+
+        .status-accepted {
+          background: rgba(16, 185, 129, 0.15);
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          color: #34d399;
+        }
+
+        .status-rejected {
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          color: #f87171;
+        }
+
         .meta-info {
           margin-top: 1rem;
           font-size: 0.9rem;
@@ -533,8 +551,18 @@ const CheckAppointments = () => {
           <div className="grid-layout">
             {appointments.map((a) => {
               const isEditing = editId === a._id;
+              let cardStyle = { borderLeft: isEditing ? "4px solid #3b82f6" : "" };
+              
+              if (!isEditing) {
+                if (a.status === 'rejected') {
+                  cardStyle = { ...cardStyle, borderColor: 'rgba(239, 68, 68, 0.5)', background: 'rgba(239, 68, 68, 0.08)' };
+                } else if (a.status === 'accepted') {
+                  cardStyle = { ...cardStyle, borderColor: 'rgba(16, 185, 129, 0.5)', background: 'rgba(16, 185, 129, 0.08)' };
+                }
+              }
+
               return (
-                <div key={a._id} className="glass-card" style={{ borderLeft: isEditing ? "4px solid #3b82f6" : "" }}>
+                <div key={a._id} className="glass-card" style={cardStyle}>
                   {isEditing ? (
                     // Inline Card Editing Form
                     <div className="edit-form">
@@ -614,7 +642,12 @@ const CheckAppointments = () => {
 
                         <div className="badge-container">
                           <span className="badge badge-dept">🩺 {a.department}</span>
-                          <span className="badge badge-doctor">Dr. {a.doctor}</span>
+                          <span className="badge badge-doctor">
+                            {a.doctor.toLowerCase().startsWith('dr') ? a.doctor : `Dr. ${a.doctor}`}
+                          </span>
+                          <span className={`badge status-${a.status || 'pending'}`}>
+                            {a.status || 'pending'}
+                          </span>
                         </div>
 
                         <div className="meta-info">
@@ -639,14 +672,16 @@ const CheckAppointments = () => {
                         </div>
                       </div>
 
-                      <div className="btn-group">
-                        <button onClick={() => handleStartEdit(a)} className="action-btn btn-edit">
-                          ✏️ Edit Booking
-                        </button>
-                        <button onClick={() => handleDelete(a._id)} className="action-btn btn-delete">
-                          🗑️ Cancel Appointment
-                        </button>
-                      </div>
+                      {a.status !== 'rejected' && (
+                        <div className="btn-group">
+                          <button onClick={() => handleStartEdit(a)} className="action-btn btn-edit">
+                            ✏️ Edit Booking
+                          </button>
+                          <button onClick={() => handleDelete(a._id)} className="action-btn btn-delete">
+                            🗑️ Cancel Appointment
+                          </button>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

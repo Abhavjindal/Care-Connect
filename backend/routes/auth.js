@@ -49,7 +49,8 @@ router.post("/signup", async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         age: newUser.age,
-        emergencyContact: newUser.emergencyContact
+        emergencyContact: newUser.emergencyContact,
+        doctorName: newUser.doctorName
       }
     });
   } catch (error) {
@@ -102,7 +103,8 @@ router.post("/login", async (req, res) => {
         email: user.email,
         role: user.role,
         age: user.age,
-        emergencyContact: user.emergencyContact
+        emergencyContact: user.emergencyContact,
+        doctorName: user.doctorName
       }
     });
   } catch (error) {

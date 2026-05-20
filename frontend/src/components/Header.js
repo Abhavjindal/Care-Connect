@@ -9,6 +9,9 @@ function Header() {
   const handleLogout = () => {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('doctorName');
+    localStorage.removeItem('token');
     window.location.href = '/';
   };
 
@@ -30,10 +33,29 @@ function Header() {
           <ul>
             <li><Link to="/" className="nav-link">Home</Link></li>
 
-            {user?.email === 'admin@careconnect.com' ? (
+            {user?.role === 'admin' || user?.email === 'admin@careconnect.com' ? (
               // Logged in as administrator
               <>
                 <li><Link to="/admin-dashboard" className="nav-link">Admin Dashboard</Link></li>
+                <li>
+                  <button
+                    className="nav-link btn-logout"
+                    onClick={handleLogout}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : user?.role === 'doctor' ? (
+              // Logged in as doctor
+              <>
+                <li><Link to="/doctor-dashboard" className="nav-link">Doctor Dashboard</Link></li>
                 <li>
                   <button
                     className="nav-link btn-logout"

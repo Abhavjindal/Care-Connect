@@ -94,6 +94,34 @@ const seedDoctors = async () => {
     if (doctors.length > 0) {
       await Doctor.insertMany(doctors);
       console.log(`✅ Successfully seeded ${doctors.length} doctors from CSV to MongoDB.`);
+
+      // Seed Doctor User Accounts
+      const salt = await bcrypt.genSalt(10);
+      const hashedDoctorPassword = await bcrypt.hash("doctor123", salt);
+      
+      const doctorUsers = doctors.map(doc => {
+        const cleanName = doc.Name.replace(/Dr\.\s*/i, '').toLowerCase().trim();
+        const email = cleanName.replace(/[^a-z0-9]/g, '.') + "@careconnect.com";
+        // Clean up multiple dots if any
+        const finalEmail = email.replace(/\.+/g, '.');
+        return {
+          name: doc.Name,
+          email: finalEmail,
+          password: hashedDoctorPassword,
+          role: "doctor",
+          doctorName: doc.Name
+        };
+      });
+      
+      let seededUsers = 0;
+      for (const du of doctorUsers) {
+        const exists = await User.findOne({ email: du.email });
+        if (!exists) {
+          await User.create(du);
+          seededUsers++;
+        }
+      }
+      console.log(`✅ Successfully seeded ${seededUsers} Doctor User accounts.`);
     }
   } catch (error) {
     console.error("❌ Error seeding doctors:", error);

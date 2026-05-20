@@ -34,15 +34,20 @@ router.post("/", async (req, res) => {
 // Get appointments (filtered by user email, or returning all if email is admin)
 router.get("/", async (req, res) => {
   try {
-    const { email } = req.query;
+    const { email, role, doctorName } = req.query;
 
     if (!email) {
       return res.status(400).json({ message: "Email parameter is required" });
     }
 
     let appointments;
-    if (email === "admin@careconnect.com") {
+    if (email === "admin@careconnect.com" || role === "admin") {
       appointments = await Appointment.find({}).sort({ createdAt: -1 });
+    } else if (role === "doctor") {
+      if (!doctorName) {
+        return res.status(400).json({ message: "Doctor name is required for doctor role" });
+      }
+      appointments = await Appointment.find({ doctor: doctorName }).sort({ createdAt: -1 });
     } else {
       appointments = await Appointment.find({ userEmail: email }).sort({ createdAt: -1 });
     }
@@ -90,6 +95,31 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting appointment:", error);
     res.status(500).json({ message: "Server error while cancelling appointment" });
+  }
+});
+
+// Update appointment status (for doctors)
+router.patch("/:id/status", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!["pending", "accepted", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const appointment = await Appointment.findById(id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    appointment.status = status;
+    await appointment.save();
+    
+    res.json({ message: `Appointment ${status} successfully`, appointment });
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Server error while updating status" });
   }
 });
 

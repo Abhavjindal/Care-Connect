@@ -15,6 +15,7 @@ import MakeAppointment from './components/MakeAppointment';
 import CheckAppointments from './components/CheckAppointments';
 import MedicineReminders from './components/MedicineReminders';
 import AdminDashboard from './components/AdminDashboard';
+import DoctorDashboard from './components/DoctorDashboard';
 import { API_BASE_URL } from './config/api';
 import ChatWidget from './components/ChatWidget'; // ✅ Import floating Chat Widget
 
@@ -26,6 +27,7 @@ function App() {
   const [user, setUser] = useState({
     email: localStorage.getItem('userEmail'),
     name: localStorage.getItem('userName'),
+    role: localStorage.getItem('userRole'),
     age: localStorage.getItem('userAge'),
     emergencyContact: localStorage.getItem('userEmergencyContact')
   });
@@ -35,7 +37,9 @@ function App() {
   const [promptContact, setPromptContact] = useState('');
 
   useEffect(() => {
-    if (user?.email && user.email !== 'admin@careconnect.com' && (!user.age || !user.emergencyContact)) {
+    // Only patients need to fill out the emergency profile
+    const isPatient = user?.email && user?.role !== 'admin' && user?.role !== 'doctor' && user.email !== 'admin@careconnect.com';
+    if (isPatient && (!user.age || !user.emergencyContact)) {
       setShowProfilePrompt(true);
     } else {
       setShowProfilePrompt(false);
@@ -153,6 +157,7 @@ function App() {
             <Route path="/check-appointments" element={<CheckAppointments />} />
             <Route path="/medicine-reminders" element={<MedicineReminders />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
 
             {/* Redirect unknown routes */}
             <Route path="*" element={<Navigate to="/" replace />} />

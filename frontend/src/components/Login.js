@@ -29,6 +29,10 @@ function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userName", data.user.name);
       localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("userRole", data.user.role);
+      if (data.user.doctorName) {
+        localStorage.setItem("doctorName", data.user.doctorName);
+      }
       localStorage.setItem("userPassword", password);
       localStorage.setItem("userAge", data.user.age || "");
       localStorage.setItem("userEmergencyContact", data.user.emergencyContact || "");
@@ -36,11 +40,15 @@ function Login() {
       setUser({
         email: data.user.email,
         name: data.user.name,
+        role: data.user.role,
+        doctorName: data.user.doctorName,
         age: data.user.age,
         emergencyContact: data.user.emergencyContact
       });
       if (data.user.role === "admin") {
         navigate("/admin-dashboard");
+      } else if (data.user.role === "doctor") {
+        navigate("/doctor-dashboard");
       } else {
         navigate("/make-appointment");
       }
