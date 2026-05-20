@@ -1,0 +1,11 @@
+gradio==5.49.1
+google-generativeai==0.8.5
+SpeechRecognition==3.14.3
+gTTS==2.5.4
+soundfile==0.13.1
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+python-dateutil==2.9.0
+zope.interface==6.3
+DateTime==5.5
