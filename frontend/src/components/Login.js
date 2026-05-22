@@ -80,7 +80,7 @@ function Login() {
       }}>
         <h2 style={{
           fontWeight: 800,
-          marginBottom: "30px",
+          marginBottom: "20px",
           textAlign: "center",
           background: "linear-gradient(135deg, #60a5fa, #a78bfa)",
           WebkitBackgroundClip: "text",
@@ -88,6 +88,7 @@ function Login() {
         }}>
           Login to CareConnect
         </h2>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <input
             type="email"
@@ -119,7 +120,7 @@ function Login() {
             style={{
               width: "100%",
               padding: "12px 15px",
-              marginBottom: "25px",
+              marginBottom: "10px",
               border: "1px solid rgba(255, 255, 255, 0.1)",
               borderRadius: "10px",
               background: "rgba(15, 23, 42, 0.65)",
@@ -129,6 +130,19 @@ function Login() {
               boxSizing: "border-box"
             }}
           />
+          <div style={{ textAlign: "right", marginBottom: "20px" }}>
+            <button 
+              type="button" 
+              onClick={() => alert("A password reset link has been sent to your email address (if registered).")}
+              style={{ 
+                background: "transparent", border: "none", color: "#60a5fa", 
+                fontSize: "13px", fontWeight: 600, cursor: "pointer", padding: 0,
+                textDecoration: "underline"
+              }}
+            >
+              Forgot Password?
+            </button>
+          </div>
           <button
             type="submit"
             style={{

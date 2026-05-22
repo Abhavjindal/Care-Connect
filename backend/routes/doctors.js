@@ -24,7 +24,12 @@ router.post("/chat", async (req, res) => {
   try {
     const systemPrompt = `You are a friendly AI doctor/nurse assistant on the CareConnect telehealth platform. The patient says: "${message}". Provide a concise, highly empathetic, and medically informed response in simple English. Keep it to 2-3 sentences. Don't diagnose diseases; give general wellness advice, ask friendly clarifying questions, and advise them to consult a CareConnect doctor if necessary.`;
 
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyC_WRtStwMRHd1LhzsmsK0Fybi8iGZfMqY", {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ message: "AI Service is not configured. Missing API key." });
+    }
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -6,6 +6,7 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [users, setUsers] = useState([]);
+  const [doctorsDirectory, setDoctorsDirectory] = useState([]);
   const [activeTab, setActiveTab] = useState("appointments");
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +49,13 @@ function AdminDashboard() {
       if (!res.ok) throw new Error("Failed to load patient records");
       const data = await res.json();
       setUsers(data);
+
+      // Also fetch doctors directory to get department information
+      const docRes = await fetch("http://localhost:5000/api/doctors");
+      if (docRes.ok) {
+        const docData = await docRes.json();
+        setDoctorsDirectory(docData);
+      }
     } catch (err) {
       console.error("Error loading patients:", err);
       showToast("Failed to load patient registry from server.", "error");
@@ -610,6 +618,12 @@ function AdminDashboard() {
             >
               👥 Patient Accounts
             </button>
+            <button
+              onClick={() => setActiveTab("doctors")}
+              className={`tab-btn ${activeTab === "doctors" ? "active" : ""}`}
+            >
+              👨‍⚕️ Doctor Accounts
+            </button>
           </nav>
 
           <button onClick={handleLogout} className="logout-btn">
@@ -760,23 +774,23 @@ function AdminDashboard() {
               </div>
             )}
           </div>
-        ) : (
+        ) : activeTab === "patients" ? (
           // Tab 2: Registered Patients Panel
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <h2 style={{ fontSize: "1.5rem", fontWeight: 700, margin: 0 }}>Registered Patients Database</h2>
               <span style={{ fontSize: "0.9rem", color: "#64748b", background: "rgba(255,255,255,0.05)", padding: "0.4rem 0.8rem", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                Total: {users.length} patients
+                Total: {users.filter(u => u.role !== 'doctor' && u.email !== 'admin@careconnect.com').length} patients
               </span>
             </div>
 
-            {users.length === 0 ? (
+            {users.filter(u => u.role !== 'doctor' && u.email !== 'admin@careconnect.com').length === 0 ? (
               <div className="dashboard-empty">
                 <p>No registered patient accounts found in the database.</p>
               </div>
             ) : (
               <div className="grid-layout">
-                {users.map((u) => (
+                {users.filter(u => u.role !== 'doctor' && u.email !== 'admin@careconnect.com').map((u) => (
                   <div key={u._id} className="glass-card" style={{ borderTop: "4px solid #ef4444" }}>
                     <div>
                       <div className="card-header" style={{ marginBottom: "0.5rem" }}>
@@ -816,6 +830,57 @@ function AdminDashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          // Tab 3: Registered Doctors Panel
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, margin: 0 }}>Registered Doctors Database</h2>
+              <span style={{ fontSize: "0.9rem", color: "#64748b", background: "rgba(255,255,255,0.05)", padding: "0.4rem 0.8rem", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                Total: {users.filter(u => u.role === 'doctor').length} doctors
+              </span>
+            </div>
+
+            {users.filter(u => u.role === 'doctor').length === 0 ? (
+              <div className="dashboard-empty">
+                <p>No registered doctor accounts found in the database.</p>
+              </div>
+            ) : (
+              <div className="grid-layout">
+                {users.filter(u => u.role === 'doctor').map((u) => {
+                  const docInfo = doctorsDirectory.find(d => d.Name === u.name || d.Name === u.doctorName);
+                  return (
+                  <div key={u._id} className="glass-card" style={{ borderTop: "4px solid #10b981" }}>
+                    <div>
+                      <div className="card-header" style={{ marginBottom: "0.5rem" }}>
+                        <div>
+                          <h3 className="card-title">{u.name}</h3>
+                          <p className="card-subtitle">{u.email}</p>
+                        </div>
+                        <span className="avatar-circle" style={{ background: "linear-gradient(135deg, #34d399, #10b981)" }}>
+                          {getInitials(u.name)}
+                        </span>
+                      </div>
+
+                      {docInfo && docInfo.Field && (
+                        <div className="badge-container" style={{ marginTop: "0", marginBottom: "1rem" }}>
+                          <span className="badge badge-dept" style={{ background: "rgba(16, 185, 129, 0.15)", borderColor: "rgba(16, 185, 129, 0.3)", color: "#6ee7b7" }}>🩺 {docInfo.Field}</span>
+                        </div>
+                      )}
+
+                      <div className="meta-info">
+                        <div className="meta-row">
+                          <span className="meta-label">Account Created:</span>
+                          <span className="meta-value" style={{ fontSize: "0.8rem" }}>
+                            {u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { dateStyle: "medium" }) : "Pre-seeded"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )})}
               </div>
             )}
           </div>
