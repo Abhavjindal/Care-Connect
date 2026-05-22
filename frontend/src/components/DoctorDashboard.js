@@ -5,6 +5,12 @@ const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   
+  // Rejection reason modal states
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedAppId, setSelectedAppId] = useState(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  
   const doctorName = localStorage.getItem("doctorName");
   
   useEffect(() => {
@@ -31,21 +37,48 @@ const DoctorDashboard = () => {
     }
   };
 
-  const handleUpdateStatus = async (id, status) => {
+  const handleUpdateStatus = async (id, status, rejectionReason = "") => {
     try {
+      const body = { status };
+      if (status === "rejected" && rejectionReason) {
+        body.rejectionReason = rejectionReason;
+      }
+      
       const res = await fetch(`${API_BASE_URL}/appointments/${id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
+        body: JSON.stringify(body)
       });
       if (res.ok) {
-        setAppointments(appointments.map(app => app._id === id ? { ...app, status } : app));
+        setAppointments(appointments.map(app => app._id === id ? { ...app, status, rejectionReason } : app));
       } else {
         alert("Failed to update status");
       }
     } catch (err) {
       console.error("Error updating status:", err);
     }
+  };
+
+  const confirmRejection = () => {
+    if (!rejectReason) {
+      alert("Please select a rejection reason.");
+      return;
+    }
+    
+    let finalReason = rejectReason;
+    if (rejectReason === "other") {
+      if (!customReason.trim()) {
+        alert("Please specify the custom rejection reason.");
+        return;
+      }
+      finalReason = customReason.trim();
+    }
+    
+    handleUpdateStatus(selectedAppId, "rejected", finalReason);
+    setShowRejectModal(false);
+    setSelectedAppId(null);
+    setRejectReason("");
+    setCustomReason("");
   };
 
   return (
@@ -144,6 +177,49 @@ const DoctorDashboard = () => {
           color: #f87171;
           border: 1px solid rgba(239, 68, 68, 0.4);
         }
+        
+        /* Modal Styles */
+        .cc-modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(15, 23, 42, 0.75);
+          backdrop-filter: blur(8px);
+          z-index: 100000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: cc-fade-in-modal 0.25s ease-out;
+        }
+        .cc-reject-modal {
+          background: white;
+          padding: 2.2rem;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 440px;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          animation: cc-slide-up-modal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cc-profile-modal-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 1rem;
+        }
+        .cc-profile-form-group {
+          margin-bottom: 1.25rem;
+          text-align: left;
+        }
+        @keyframes cc-fade-in-modal {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes cc-slide-up-modal {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
       `}</style>
       
       <header className="glass-header">
@@ -174,6 +250,11 @@ const DoctorDashboard = () => {
                   <span className={`status-badge status-${app.status || 'pending'}`}>
                     {app.status || 'pending'}
                   </span>
+                  {app.status === "rejected" && app.rejectionReason && (
+                    <p style={{ marginTop: "10px", color: "#f87171", fontSize: "0.85rem", background: "rgba(239, 68, 68, 0.1)", padding: "8px 12px", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.2)", display: "inline-block" }}>
+                      <strong>Rejection Reason:</strong> {app.rejectionReason}
+                    </p>
+                  )}
                 </div>
               </div>
               
@@ -183,7 +264,10 @@ const DoctorDashboard = () => {
                     <button className="btn-accept" onClick={() => handleUpdateStatus(app._id, "accepted")}>
                       <i className="bi bi-check-lg"></i> Accept
                     </button>
-                    <button className="btn-reject" onClick={() => handleUpdateStatus(app._id, "rejected")}>
+                    <button className="btn-reject" onClick={() => {
+                      setSelectedAppId(app._id);
+                      setShowRejectModal(true);
+                    }}>
                       <i className="bi bi-x-lg"></i> Reject
                     </button>
                   </>
@@ -193,6 +277,110 @@ const DoctorDashboard = () => {
           ))
         )}
       </div>
+
+      {/* Sleek Glassmorphic Rejection Reason Modal */}
+      {showRejectModal && (
+        <div className="cc-modal-backdrop">
+          <div className="cc-reject-modal">
+            <div className="cc-profile-modal-header">
+              <i className="bi bi-exclamation-triangle-fill" style={{ color: "#ef4444", fontSize: "1.8rem", marginRight: "10px" }}></i>
+              <h3 style={{ margin: 0, color: "#1e293b", fontWeight: 700 }}>Specify Rejection Reason</h3>
+            </div>
+            <p style={{ color: "#64748b", fontSize: "0.9rem", margin: "10px 0 20px 0", textAlign: "left", lineHeight: "1.5" }}>
+              Please select or enter the reason for rejecting this appointment. The patient will see this reason in their dashboard.
+            </p>
+            
+            <div className="cc-profile-form-group">
+              <label style={{ display: "block", fontSize: "13.5px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>Reason for Rejection</label>
+              <select 
+                className="cc-profile-input" 
+                value={rejectReason} 
+                onChange={(e) => setRejectReason(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  outline: "none",
+                  background: "white",
+                  color: "#334155"
+                }}
+              >
+                <option value="">-- Select a reason --</option>
+                <option value="Schedule conflict / Doctor unavailable">Schedule conflict / Doctor unavailable</option>
+                <option value="Incorrect department selected">Incorrect department selected</option>
+                <option value="Emergency surgical/clinical priority">Emergency surgical/clinical priority</option>
+                <option value="Patient request for reschedule">Patient request for reschedule</option>
+                <option value="Doctor on medical leave">Doctor on medical leave</option>
+                <option value="other">Other (please specify)</option>
+              </select>
+            </div>
+            
+            {rejectReason === "other" && (
+              <div className="cc-profile-form-group" style={{ marginTop: "15px" }}>
+                <label style={{ display: "block", fontSize: "13.5px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>Custom Reason</label>
+                <textarea 
+                  className="cc-profile-input"
+                  rows="3"
+                  placeholder="Type the custom rejection reason here..."
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    outline: "none",
+                    fontFamily: "inherit",
+                    resize: "none",
+                    color: "#334155"
+                  }}
+                />
+              </div>
+            )}
+            
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "25px" }}>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setSelectedAppId(null);
+                  setRejectReason("");
+                  setCustomReason("");
+                }}
+                style={{
+                  background: "#f1f5f9",
+                  color: "#475569",
+                  border: "none",
+                  padding: "10px 18px",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmRejection}
+                style={{
+                  background: "linear-gradient(135deg, #ef4444, #b91c1c)",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 18px",
+                  borderRadius: "8px",
+                  fontWeight: "600",
+                  cursor: "pointer"
+                }}
+              >
+                Confirm Rejection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

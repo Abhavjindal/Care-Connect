@@ -669,6 +669,12 @@ const CheckAppointments = () => {
                               <p style={{ margin: "2px 0 0 0", fontSize: "0.85rem", color: "#cbd5e1" }}>{a.message}</p>
                             </div>
                           )}
+                          {a.status === "rejected" && a.rejectionReason && (
+                            <div style={{ marginTop: "0.75rem", background: "rgba(239, 68, 68, 0.08)", padding: "0.5rem 0.75rem", borderRadius: "8px", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+                              <p style={{ margin: 0, fontSize: "0.75rem", color: "#fca5a5", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em" }}>Rejection Reason</p>
+                              <p style={{ margin: "2px 0 0 0", fontSize: "0.85rem", color: "#fca5a5" }}>{a.rejectionReason}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
 

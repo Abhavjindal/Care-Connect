@@ -10,6 +10,7 @@ const appointmentSchema = new mongoose.Schema({
   doctor: { type: String, required: true },
   message: { type: String },
   status: { type: String, enum: ["pending", "accepted", "rejected"], default: "pending" },
+  rejectionReason: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model("Appointment", appointmentSchema);

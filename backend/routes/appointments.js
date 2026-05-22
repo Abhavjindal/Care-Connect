@@ -102,7 +102,7 @@ router.delete("/:id", async (req, res) => {
 router.patch("/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, rejectionReason } = req.body;
     
     if (!["pending", "accepted", "rejected"].includes(status)) {
       return res.status(400).json({ message: "Invalid status value" });
@@ -114,6 +114,9 @@ router.patch("/:id/status", async (req, res) => {
     }
 
     appointment.status = status;
+    if (status === "rejected" && rejectionReason) {
+      appointment.rejectionReason = rejectionReason;
+    }
     await appointment.save();
     
     res.json({ message: `Appointment ${status} successfully`, appointment });
