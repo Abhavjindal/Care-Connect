@@ -1,51 +1,51 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCalendarCheck,
+  faRobot,
+  faBell,
+  faClock,
   faUserMd,
-  faStethoscope,
-  faVials,
-  faAmbulance,
-  faWheelchair,
-  faNotesMedical,
+  faUserShield,
 } from "@fortawesome/free-solid-svg-icons";
 
 function Services() {
   const services = [
     {
+      icon: faCalendarCheck,
+      title: "Book Appointments",
+      description:
+        "Easily schedule appointments with specialists across departments like Pediatrics, Dermatology, Neurology, and more.",
+    },
+    {
+      icon: faRobot,
+      title: "AI Doctor Chat",
+      description:
+        "Chat with our AI-powered doctor assistant anytime for instant health advice and guidance before your consultation.",
+    },
+    {
+      icon: faBell,
+      title: "Medicine Reminders",
+      description:
+        "Set personalised medication reminders so you never miss a dose — manage and track them all from your dashboard.",
+    },
+    {
+      icon: faClock,
+      title: "Track Consultations",
+      description:
+        "Keep track of all your upcoming and past consultations, check status updates, and manage your health timeline.",
+    },
+    {
       icon: faUserMd,
-      title: "Primary Care",
+      title: "Specialist Directory",
       description:
-        "General consultations, health checkups, and preventive care from hospitals and clinics near you.",
+        "Browse and select from our diverse network of expert doctors sorted by department to get the most accurate care.",
     },
     {
-      icon: faStethoscope,
-      title: "Specialist Consultations",
+      icon: faUserShield,
+      title: "Secure Patient Profile",
       description:
-        "Expert advice from specialists in cardiology, orthopedics, neurology, dermatology, and more.",
-    },
-    {
-      icon: faVials,
-      title: "Diagnostics & Lab Tests",
-      description:
-        "Access labs and imaging centers for blood tests, X-rays, MRIs, ultrasounds, and other diagnostic needs.",
-    },
-    {
-      icon: faAmbulance,
-      title: "Emergency & Urgent Care",
-      description:
-        "Locate nearby emergency rooms and urgent care clinics for quick medical attention.",
-    },
-    {
-      icon: faWheelchair,
-      title: "Rehabilitation & Therapy",
-      description:
-        "Book physiotherapy, occupational therapy, and speech therapy services at trusted centers.",
-    },
-    {
-      icon: faNotesMedical,
-      title: "Pharmacy & Medicine Delivery",
-      description:
-        "Get e-prescriptions and convenient medicine delivery or pickup from partner pharmacies.",
+        "Update your personal profile, keep your contact info current, and change or reset your password securely.",
     },
   ];
 
