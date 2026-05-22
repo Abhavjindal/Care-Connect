@@ -533,6 +533,57 @@ const MedicineReminders = () => {
                 Add Reminder
               </button>
             </form>
+
+            {/* Simulate test notification button */}
+            <div style={{ marginTop: "1.25rem", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "1.25rem" }}>
+              <p style={{ fontSize: "0.75rem", color: "#64748b", marginBottom: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>
+                🔬 Demo / Preview
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  const testMedicineName = medName.trim() || "Paracetamol 650mg";
+                  window.dispatchEvent(new CustomEvent("trigger-test-med-reminder", {
+                    detail: {
+                      medicineName: testMedicineName,
+                      time: "Test Alarm — Right Now"
+                    }
+                  }));
+                }}
+                style={{
+                  width: "100%",
+                  padding: "0.85rem 1.25rem",
+                  borderRadius: "12px",
+                  border: "2px solid rgba(251, 191, 36, 0.4)",
+                  background: "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.08))",
+                  color: "#fbbf24",
+                  fontWeight: 700,
+                  fontSize: "0.95rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.6rem",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 0 18px rgba(251,191,36,0.15)"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.18))";
+                  e.currentTarget.style.boxShadow = "0 0 28px rgba(251,191,36,0.35)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.borderColor = "rgba(251, 191, 36, 0.7)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.08))";
+                  e.currentTarget.style.boxShadow = "0 0 18px rgba(251,191,36,0.15)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = "rgba(251, 191, 36, 0.4)";
+                }}
+              >
+                <i className="bi bi-bell-fill" style={{ fontSize: "1.1rem" }}></i>
+                Simulate Notification Pop-up
+              </button>
+            </div>
           </div>
 
           {/* Active Reminders Display Card */}
