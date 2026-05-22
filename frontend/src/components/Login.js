@@ -50,7 +50,7 @@ function Login() {
       } else if (data.user.role === "doctor") {
         navigate("/doctor-dashboard");
       } else {
-        navigate("/make-appointment");
+        navigate("/");
       }
     } catch (error) {
       console.error("Error logging in:", error);
